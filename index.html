@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruddy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Ruddy Duck Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            duck: {
+              brown: '#4F2C1E',  /* Chestnut — primary brand */
+              'brown-light': '#6B3E2B',
+              'brown-xlight': '#8B5240',
+              blue: '#1A96E8',  /* Sky Blue — action color */
+              'blue-light': '#3EAAEE',
+              'blue-dark': '#137ABE',
+              cream: '#FFF5E6',  /* Off-white — background */
+              'cream-dark': '#F0E6D3',
+              black: '#111111',  /* Charcoal — text */
+              'black-soft': '#2D2019',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'Space Grotesk', 'sans-serif'],
+            display: ['Space Grotesk', 'Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'SF Mono', 'Fira Code', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@19.0.0",
+    "react-dom/": "https://esm.sh/react-dom@19.0.0/",
+    "react/": "https://esm.sh/react@19.0.0/",
+    "lucide-react": "https://esm.sh/lucide-react@0.460.0"
+  }
+}
+</script>
+  <link rel="stylesheet" href="/index.css">
+</head>
+
+<body class="bg-duck-cream text-duck-black">
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+
+</html>
