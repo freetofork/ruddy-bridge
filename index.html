@@ -75,37 +75,33 @@
     <a id="manual-btn" href="duckdb-analytics://success" class="btn">Open Ruddy App Manually</a>
 
     <script>
-        // 🟢 PART 2: The "Smart" Jump (Preserves Login Tokens & Session IDs)
-        window.onload = function () {
-            // Supabase implicit flow puts tokens in the hash (#access_token=...).
-            // macOS can strip hash fragments when dispatching custom URL scheme deep links,
-            // so we flatten everything into query params (?access_token=...) which are always preserved.
-            const hashContent = window.location.hash.replace(/^#/, '');
-            const searchContent = window.location.search.replace(/^\?/, '');
-            const allParams = [searchContent, hashContent].filter(Boolean).join('&');
-            const appUrl = allParams
-                ? "duckdb-analytics://success?" + allParams
-                : "duckdb-analytics://success";
+    window.onload = function () {
+        // Supabase implicit flow puts tokens in the hash (#access_token=...).
+        // macOS strips hash fragments when dispatching custom URL scheme deep links,
+        // so we flatten everything into query params (?access_token=...) which are preserved.
+        const hashContent = window.location.hash.replace(/^#/, '');
+        const searchContent = window.location.search.replace(/^\?/, '');
+        const allParams = [searchContent, hashContent].filter(Boolean).join('&');
+        const appUrl = allParams
+            ? "duckdb-analytics://success?" + allParams
+            : "duckdb-analytics://success";
 
-            const btn = document.getElementById('manual-btn');
+        const btn = document.getElementById('manual-btn');
+        btn.href = appUrl;
 
-            // 1. Update the manual button immediately
-            btn.href = appUrl;
+        try {
+            window.location.href = appUrl;
+        } catch (e) {
+            console.log("Automatic jump blocked. User click required.");
+        }
 
-            // 2. Try the automatic jump
-            try {
-                window.location.href = appUrl;
-            } catch (e) {
-                console.log("Automatic jump blocked. User click required.");
-            }
+        setTimeout(() => {
+            btn.style.transform = "scale(1.1)";
+            btn.style.boxShadow = "0 8px 25px rgba(26, 150, 232, 0.6)";
+        }, 1000);
+    };
+</script>
 
-            // 3. Highlight button if jump is blocked or delayed
-            setTimeout(() => {
-                btn.style.transform = "scale(1.1)";
-                btn.style.boxShadow = "0 8px 25px rgba(26, 150, 232, 0.6)";
-            }, 1000);
-        };
-    </script>
 </body>
 
 </html>
