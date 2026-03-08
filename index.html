@@ -76,19 +76,22 @@
 
     <div id="copy-area"
         style="display: none; margin-top: 40px; padding: 20px; background: rgba(26, 150, 232, 0.05); border-radius: 20px; border: 1px dashed rgba(26, 150, 232, 0.3); max-width: 400px;">
-        <p style="font-size: 13px; margin-bottom: 12px; color: #1A96E8; font-weight: 700;">Automatic open failed?</p>
+        <p id="token-status" style="font-size: 13px; margin-bottom: 12px; color: #1A96E8; font-weight: 700;">Detection
+            Status...</p>
         <button id="copy-btn" class="btn"
             style="padding: 12px 24px; font-size: 13px; background: #FFF; color: #1A96E8; border: 2px solid #1A96E8; box-shadow: none;">Copy
-            Link for App</button>
+            Manual Link For App</button>
         <p id="copy-status" style="font-size: 11px; margin: 8px 0 0; color: #1A96E8; font-weight: 600;"></p>
+        <p style="font-size: 10px; margin-top: 10px; color: #4F2C1E80;">If the app didn't open automatically, click the
+            button above and paste the result into the app's Diagnostics box.</p>
     </div>
 
     <script>
-        // 🟢 PART 2: The "Smart" Jump (Preserves Login Tokens & Session IDs)
         window.onload = function () {
             const hashContent = window.location.hash.replace(/^#/, '');
             const searchContent = window.location.search.replace(/^\?/, '');
             const allParams = [searchContent, hashContent].filter(Boolean).join('&');
+
             const appUrl = allParams
                 ? "duckdb-analytics://success?" + allParams
                 : "duckdb-analytics://success";
@@ -97,29 +100,40 @@
             const copyArea = document.getElementById('copy-area');
             const copyBtn = document.getElementById('copy-btn');
             const copyStatus = document.getElementById('copy-status');
+            const tokenStatus = document.getElementById('token-status');
 
-            // 1. Update the manual button immediately
             btn.href = appUrl;
 
-            // 2. Try the automatic jump
+            if (allParams.includes('access_token=')) {
+                tokenStatus.innerText = "✅ Login Tokens Detected!";
+                tokenStatus.style.color = "#10b981";
+            } else if (allParams.includes('error=')) {
+                tokenStatus.innerText = "❌ Auth Error Found in URL";
+                tokenStatus.style.color = "#ef4444";
+            } else {
+                tokenStatus.innerText = "⚠️ No Login Tokens Found!";
+                tokenStatus.style.color = "#f59e0b";
+            }
+
             try {
                 window.location.href = appUrl;
             } catch (e) {
-                console.log("Automatic jump blocked. User click required.");
+                console.log("Jump blocked.");
             }
 
-            // 3. Setup copy fallback
             setTimeout(() => {
                 copyArea.style.display = 'block';
                 btn.style.transform = "scale(1.1)";
-                btn.style.boxShadow = "0 8px 25px rgba(26, 150, 232, 0.6)";
-            }, 1000);
+            }, 800);
 
             copyBtn.onclick = function () {
-                const fullUrl = window.location.href;
-                navigator.clipboard.writeText(fullUrl).then(() => {
-                    copyStatus.innerText = "✅ Copied! Now paste this into the app's Diagnostics box.";
-                    setTimeout(() => { copyStatus.innerText = ""; }, 3000);
+                navigator.clipboard.writeText(appUrl).then(() => {
+                    copyStatus.innerText = "✅ DEEP LINK COPIED! Now paste into the app.";
+                    copyBtn.innerText = "Copied!";
+                    setTimeout(() => {
+                        copyStatus.innerText = "";
+                        copyBtn.innerText = "Copy Manual Link For App";
+                    }, 4000);
                 });
             };
         };
