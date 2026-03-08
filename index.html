@@ -2,63 +2,110 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ruddy</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- NOTE: No meta-refresh here — it would redirect WITHOUT auth tokens (hash fragment is lost) -->
 
-  <!-- Ruddy Duck Typography -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
-    rel="stylesheet">
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            duck: {
-              brown: '#4F2C1E',  /* Chestnut — primary brand */
-              'brown-light': '#6B3E2B',
-              'brown-xlight': '#8B5240',
-              blue: '#1A96E8',  /* Sky Blue — action color */
-              'blue-light': '#3EAAEE',
-              'blue-dark': '#137ABE',
-              cream: '#FFF5E6',  /* Off-white — background */
-              'cream-dark': '#F0E6D3',
-              black: '#111111',  /* Charcoal — text */
-              'black-soft': '#2D2019',
-            }
-          },
-          fontFamily: {
-            sans: ['Inter', 'Space Grotesk', 'sans-serif'],
-            display: ['Space Grotesk', 'Inter', 'sans-serif'],
-            mono: ['JetBrains Mono', 'SF Mono', 'Fira Code', 'monospace'],
-          }
+    <title>Opening Ruddy App...</title>
+    <style>
+        body {
+            font-family: -apple-system, system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #FFF5E6;
+            color: #4F2C1E;
+            margin: 0;
+            text-align: center;
         }
-      }
-    }
-  </script>
 
+        .loader {
+            border: 4px solid #F0E6D3;
+            border-top: 4px solid #1A96E8;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 24px;
+        }
 
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@19.0.0",
-    "react-dom/": "https://esm.sh/react-dom@19.0.0/",
-    "react/": "https://esm.sh/react@19.0.0/",
-    "lucide-react": "https://esm.sh/lucide-react@0.460.0"
-  }
-}
-</script>
-  <link rel="stylesheet" href="/index.css">
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 800;
+            margin: 0 0 8px;
+        }
+
+        p {
+            color: #4F2C1E80;
+            margin: 0 0 32px;
+            font-weight: 500;
+        }
+
+        .btn {
+            background: #1A96E8;
+            color: white;
+            padding: 16px 36px;
+            border-radius: 100px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 15px;
+            box-shadow: 0 4px 15px rgba(26, 150, 232, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+    </style>
 </head>
 
-<body class="bg-duck-cream text-duck-black">
-  <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
+<body>
+    <div class="loader"></div>
+    <h1>Opening Ruddy Workspace</h1>
+    <p>We're sending you back to the app...</p>
+
+    <a id="manual-btn" href="duckdb-analytics://success" class="btn">Open Ruddy App Manually</a>
+
+    <script>
+        // 🟢 PART 2: The "Smart" Jump (Preserves Login Tokens & Session IDs)
+        window.onload = function () {
+            // Supabase implicit flow puts tokens in the hash (#access_token=...).
+            // macOS can strip hash fragments when dispatching custom URL scheme deep links,
+            // so we flatten everything into query params (?access_token=...) which are always preserved.
+            const hashContent = window.location.hash.replace(/^#/, '');
+            const searchContent = window.location.search.replace(/^\?/, '');
+            const allParams = [searchContent, hashContent].filter(Boolean).join('&');
+            const appUrl = allParams
+                ? "duckdb-analytics://success?" + allParams
+                : "duckdb-analytics://success";
+
+            const btn = document.getElementById('manual-btn');
+
+            // 1. Update the manual button immediately
+            btn.href = appUrl;
+
+            // 2. Try the automatic jump
+            try {
+                window.location.href = appUrl;
+            } catch (e) {
+                console.log("Automatic jump blocked. User click required.");
+            }
+
+            // 3. Highlight button if jump is blocked or delayed
+            setTimeout(() => {
+                btn.style.transform = "scale(1.1)";
+                btn.style.boxShadow = "0 8px 25px rgba(26, 150, 232, 0.6)";
+            }, 1000);
+        };
+    </script>
 </body>
 
 </html>
